@@ -15,7 +15,9 @@ import com.reactnative.googlefit.GoogleFitManager;
 
 import com.facebook.react.bridge.ReactContext;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.util.Log;
 
 import com.google.android.gms.fitness.Fitness;
@@ -33,7 +35,6 @@ import com.google.android.gms.fitness.result.ListSubscriptionsResult;
 import com.google.android.gms.fitness.data.Subscription;
 
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
