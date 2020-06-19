@@ -649,6 +649,7 @@ class RNGoogleFit {
       startDate,
       endDate,
       options.calories,
+      options.distance || 0,
       (error) => {
         callback(error, false)
       },
