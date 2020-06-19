@@ -135,7 +135,8 @@ public class GoogleFitManager implements
         GoogleApiClient.Builder apiClientBuilder = new GoogleApiClient.Builder(mReactContext.getApplicationContext())
                 .addApi(Fitness.SENSORS_API)
                 .addApi(Fitness.HISTORY_API)
-                .addApi(Fitness.RECORDING_API);
+                .addApi(Fitness.RECORDING_API)
+                .addApi(Fitness.SESSIONS_API);
 
         for (String scopeName : userScopes) {
             apiClientBuilder.addScope(new Scope(scopeName));

@@ -18,7 +18,10 @@ declare module 'react-native-google-fit' {
      * Simply create an event listener for the {DATA_TYPE}_RECORDING (ex. STEP_RECORDING)
      * and check for {recording: true} as the event data
      */
-    startRecording: (callback: (param: any) => void, dataTypes: Array<string>) => void
+    startRecording: (
+      callback: (param: any) => void,
+      dataTypes: Array<string>
+    ) => void
 
     getSteps(dayStart: Date | string, dayEnd: Date | string): any
 
@@ -48,13 +51,16 @@ declare module 'react-native-google-fit' {
 
     /**
      * Get the total steps per day over a specified date range.
-      * @param {Object} options getUserInputSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
-      * @param {Function} callback The function will be called with an array of elements.
-      */
-    getUserInputSteps: (options: {
-        startDate: string,
-        endDate: string,
-    }, callback: (isError?: boolean, result?: number)=> void ) => void;
+     * @param {Object} options getUserInputSteps accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @param {Function} callback The function will be called with an array of elements.
+     */
+    getUserInputSteps: (
+      options: {
+        startDate: string
+        endDate: string
+      },
+      callback: (isError?: boolean, result?: number) => void
+    ) => void
 
     /**
      * Get the total distance per day over a specified date range.
@@ -161,8 +167,6 @@ declare module 'react-native-google-fit' {
       callback?: (isError: boolean, result: any) => void
     ) => Promise<any> | void
 
-
-
     isAvailable(callback: (isError: boolean, result: boolean) => void): void
 
     isEnabled(callback: (isError: boolean, result: boolean) => void): void
@@ -184,6 +188,26 @@ declare module 'react-native-google-fit' {
     lbsAndOzToK(imperial: any): any
 
     KgToLbs(metric: any): any
+
+    /**
+     * Get the total distance per day over a specified date range.
+     * @param {Object} options getWorkoutSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @callback {Function} callback The function will be called with an array of elements.
+     */
+    getWorkoutSamples(
+      options: SamplesOptions,
+      callback: (isError: boolean, result: any) => void
+    ): void
+
+    /**
+     *
+     * @param {Object} options submitWorkout accepts an options object containing required startDate: ISO8601Timestamp, endDate: ISO8601Timestamp, workoutType one of {WorkoutTypes}
+     * @param callback {Function} The function will be called with an array of elements
+     */
+    submitWorkout(
+      options: WorkoutOptions,
+      callback: (isError: boolean, success: boolean) => void
+    ): void
   }
 
   export interface WeightSample {
@@ -209,6 +233,18 @@ declare module 'react-native-google-fit' {
 
   export interface AuthorizeOptions {
     scopes: Array<Scopes>
+  }
+
+  export interface WorkoutOptions {
+    workoutType: WorkoutTypes
+    startDate: string
+    endDate: string
+    calories: number
+  }
+
+  export interface SamplesOptions {
+    startDate: string
+    endDate: string
   }
 
   export interface Hydration {
@@ -320,6 +356,18 @@ declare module 'react-native-google-fit' {
      * @type {string}
      */
     IRON = 'iron',
+  }
+
+  export enum WorkoutType {
+    WALK = 'walk',
+    RUN = 'run',
+    YOGA = 'yoga',
+    STRENGTH_TRAINING = 'strengthTraining',
+    SWIMMING = 'swimming',
+    CYCLING = 'cycling',
+    MINDFULNESS = 'mindfulness',
+    DANCE = 'dance',
+    CROSS_TRAINING = 'crossTraining',
   }
 
   export enum Scopes {
