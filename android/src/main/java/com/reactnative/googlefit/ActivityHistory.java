@@ -175,10 +175,12 @@ public class ActivityHistory {
                 map.putString("workoutType", getWorkoutType(activity));
 
                 for (DataSet dataSet : bucket.getDataSets()) {
-                    // Each bucket should realistically have one dataset since we are querying by one single datatype
                     for (DataPoint dataPoint : dataSet.getDataPoints()) {
-                        // There should be only one datapoint in each dataset
-                        map.putDouble("calories", dataPoint.getValue(Field.FIELD_CALORIES).asFloat());
+                        DataType pointDataType = dataPoint.getDataType();
+                        if(pointDataType == DataType.TYPE_CALORIES_EXPENDED)
+                            map.putDouble("calories", dataPoint.getValue(Field.FIELD_CALORIES).asFloat());
+                        if (pointDataType == DataType.TYPE_DISTANCE_DELTA)
+                            map.putDouble("distance", dataPoint.getValue(Field.FIELD_DISTANCE).asFloat());
                     }
                 }
 
@@ -189,7 +191,7 @@ public class ActivityHistory {
         return results;
     }
 
-    public void submitWorkout(String workoutType, long startTime, long endTime, float calories) throws Exception {
+    public void submitWorkout(String workoutType, long startTime, long endTime, float calories, float distance) throws Exception {
         // Create calories
         DataSource caloriesDataSource = new DataSource.Builder()
                 .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
@@ -197,23 +199,43 @@ public class ActivityHistory {
                 .setType(DataSource.TYPE_RAW)
                 .build();
 
+
+
         DataSet caloriesDataSet = DataSet.create(caloriesDataSource);
         DataPoint caloriesDataPoint = caloriesDataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
         caloriesDataPoint.getValue(Field.FIELD_CALORIES).setFloat(calories);
         caloriesDataSet.add(caloriesDataPoint);
 
+        String activityType = getActivityType(workoutType);
+
         // Persist everything in google store
         Session session = new Session.Builder()
-                .setActivity(getActivityType(workoutType))
+                .setActivity(activityType)
                 .setIdentifier(UUID.randomUUID().toString())
                 .setStartTime(startTime, TimeUnit.MILLISECONDS)
                 .setEndTime(endTime, TimeUnit.MILLISECONDS)
                 .build();
 
-        SessionInsertRequest insertRequest = new SessionInsertRequest.Builder()
+        SessionInsertRequest insertRequest;
+        SessionInsertRequest.Builder sessionInsertBuilder = new SessionInsertRequest.Builder()
                 .setSession(session)
-                .addDataSet(caloriesDataSet)
-                .build();
+                .addDataSet(caloriesDataSet);
+
+        if (activityType == FitnessActivities.WALKING || activityType == FitnessActivities.RUNNING ) {
+            // Create distance for run/walk
+            DataSource distanceDataSource = new DataSource.Builder()
+                    .setAppPackageName(GoogleFitPackage.PACKAGE_NAME)
+                    .setDataType(DataType.TYPE_DISTANCE_DELTA)
+                    .setType(DataSource.TYPE_RAW)
+                    .build();
+            DataSet distanceDataSet = DataSet.create(distanceDataSource);
+            DataPoint distanceDataPoint = distanceDataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
+            distanceDataPoint.getValue(Field.FIELD_DISTANCE).setFloat(distance);
+            caloriesDataSet.add(distanceDataPoint);
+            sessionInsertBuilder.addDataSet(distanceDataSet);
+        }
+
+        insertRequest = sessionInsertBuilder.build();
 
         Status status = Fitness.SessionsApi.insertSession(googleFitManager.getGoogleApiClient(), insertRequest).await(1, TimeUnit.MINUTES);
         if (!status.isSuccess()) {

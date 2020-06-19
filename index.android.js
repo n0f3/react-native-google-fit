@@ -641,7 +641,7 @@ class RNGoogleFit {
     )
   }
 
-  submitWorkout(options, callback) {
+  saveWorkout(options, callback) {
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
     googleFit.submitWorkout(

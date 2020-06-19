@@ -191,7 +191,13 @@ declare module 'react-native-google-fit' {
 
     /**
      * Get the total distance per day over a specified date range.
-     * @param {Object} options getWorkoutSamples accepts an options object containing required startDate: ISO8601Timestamp and endDate: ISO8601Timestamp.
+     * @param {Object} options getWorkoutSamples accepts an options object
+     * ```
+     * {
+     *    startDate: ISO8601Timestamp,
+     *    endDate: ISO8601Timestamp
+     * }
+     * ```
      * @callback {Function} callback The function will be called with an array of elements.
      */
     getWorkoutSamples(
@@ -201,10 +207,19 @@ declare module 'react-native-google-fit' {
 
     /**
      *
-     * @param {Object} options submitWorkout accepts an options object containing required startDate: ISO8601Timestamp, endDate: ISO8601Timestamp, workoutType one of {WorkoutTypes}
+     * @param {Object} options submitWorkout accepts an options object containing
+     * ```
+     * {
+     *    startDate: ISO8601Timestamp
+     *    endDate: ISO8601Timestamp
+     *    workoutType: 'walk' | 'run' | 'yoga' | 'strengthTraining' | 'swimming' | 'cycling' | 'mindfulness' | 'dance' | 'crossTraining'
+     *    calories: number (kcal)
+     *    distance?: number (meters)
+     * }
+     * ```
      * @param callback {Function} The function will be called with an array of elements
      */
-    submitWorkout(
+    saveWorkout(
       options: WorkoutOptions,
       callback: (isError: boolean, success: boolean) => void
     ): void
@@ -236,10 +251,11 @@ declare module 'react-native-google-fit' {
   }
 
   export interface WorkoutOptions {
-    workoutType: WorkoutTypes
+    workoutType: WorkoutType
     startDate: string
     endDate: string
     calories: number
+    distance?: number
   }
 
   export interface SamplesOptions {
