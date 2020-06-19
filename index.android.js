@@ -648,7 +648,7 @@ class RNGoogleFit {
       options.workoutType,
       startDate,
       endDate,
-      options.calories,
+      options.calories || 0,
       options.distance || 0,
       (error) => {
         callback(error, false)

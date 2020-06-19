@@ -147,6 +147,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
                               double startDate,
                               double endDate,
                               double calories,
+                              double distance,
                               Callback errorCallback,
                               Callback successCallback) {
 
