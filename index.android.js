@@ -58,8 +58,13 @@ class RNGoogleFit {
   }
 
   checkIsAuthorized = async () => {
-    const { isAuthorized } = await googleFit.isAuthorized()
-    this.isAuthorized = isAuthorized
+    try {
+      const { isAuthorized } = await googleFit.isAuthorized()
+      this.isAuthorized = isAuthorized
+      return Promise.resolve(isAuthorized)
+    } catch (e) {
+      return Promise.reject(e)
+    }
   }
 
   disconnect = () => {
@@ -462,7 +467,7 @@ class RNGoogleFit {
     )
   }
 
-  isAvailable(callback) {
+  isInstalled(callback) {
     // true if GoogleFit installed
     googleFit.isAvailable(
       (msg) => {

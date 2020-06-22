@@ -335,9 +335,9 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void isAvailable(Callback errorCallback, Callback successCallback) { // true if GoogleFit installed
+    public void isInstalled(Callback errorCallback, Callback successCallback) { // true if GoogleFit installed
         try {
-            successCallback.invoke(isAvailableCheck());
+            successCallback.invoke(isInstalledCheck());
         } catch (IllegalViewOperationException e) {
             errorCallback.invoke(e.getMessage());
         }
@@ -363,7 +363,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
         }
     }
 
-    private boolean isAvailableCheck() {
+    private boolean isInstalledCheck() {
         PackageManager pm = mReactContext.getPackageManager();
         try {
             pm.getPackageInfo(GOOGLE_FIT_APP_URI, PackageManager.GET_ACTIVITIES);
