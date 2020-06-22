@@ -167,7 +167,12 @@ declare module 'react-native-google-fit' {
       callback?: (isError: boolean, result: any) => void
     ) => Promise<any> | void
 
-    isAvailable(callback: (isError: boolean, result: boolean) => void): void
+    /**
+     * Return whether or not the user has the Google Fit app installed on their device
+     * Please note: this is not required for proper implementation of google fit APIs
+     * @param callback The function will be called with isError if there was an error retrieving install information, otherwise it will be called with result true/false whether we have found the Gooogle Fit app installed on device
+     */
+    isInstalled(callback: (isError: boolean, result: boolean) => void): void
 
     isEnabled(callback: (isError: boolean, result: boolean) => void): void
 
