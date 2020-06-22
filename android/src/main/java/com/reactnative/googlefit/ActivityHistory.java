@@ -104,7 +104,7 @@ public class ActivityHistory {
                 map.putDouble("start",start);
                 map.putDouble("end",end);
                 map.putString("activityName", activityName);
-                String deviceName = "";
+                String deviceName = "Android";
                 String sourceId = "";
                 boolean isTracked = true;
                 for (DataSet dataSet : bucket.getDataSets()) {
@@ -231,7 +231,7 @@ public class ActivityHistory {
             DataSet distanceDataSet = DataSet.create(distanceDataSource);
             DataPoint distanceDataPoint = distanceDataSet.createDataPoint().setTimeInterval(startTime, endTime, TimeUnit.MILLISECONDS);
             distanceDataPoint.getValue(Field.FIELD_DISTANCE).setFloat(distance);
-            caloriesDataSet.add(distanceDataPoint);
+            distanceDataSet.add(distanceDataPoint);
             sessionInsertBuilder.addDataSet(distanceDataSet);
         }
 

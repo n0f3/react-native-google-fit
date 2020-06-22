@@ -261,9 +261,15 @@ class RNGoogleFit {
   }
 
   getActivitySamples(options, callback) {
+    const startDate = !isNil(options.startDate)
+      ? Date.parse(options.startDate)
+      : new Date().setHours(0, 0, 0, 0)
+    const endDate = !isNil(options.endDate)
+      ? Date.parse(options.endDate)
+      : new Date().valueOf()
     googleFit.getActivitySamples(
-      options.startDate,
-      options.endDate,
+      startDate,
+      endDate,
       (error) => {
         callback(error, false)
       },
