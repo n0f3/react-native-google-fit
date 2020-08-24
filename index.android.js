@@ -4,6 +4,7 @@ import {
   NativeModules,
   PermissionsAndroid,
 } from 'react-native'
+import moment from 'moment'
 
 import PossibleScopes from './src/scopes'
 import WorkoutTypes from './src/workoutTypes'
@@ -16,6 +17,7 @@ import {
   prepareResponse,
   prepareHydrationResponse,
   prepareDeleteOptions,
+  getWeekBoundary,
 } from './src/utils'
 
 const googleFit = NativeModules.RNGoogleFit
@@ -147,20 +149,42 @@ class RNGoogleFit {
     })
   }
 
-  // Will be deprecated in future releases
-  getSteps(dayStart, dayEnd) {
-    googleFit.getDailySteps(Date.parse(dayStart), Date.parse(dayEnd))
+  /**
+   * A shortcut to get the total steps of a given day by using getDailyStepCountSamples
+   * @param {Date} date optional param, new moment() will be used if date is not provided
+   */
+  getDailySteps(date = moment()) {
+    const options = {
+      startDate: moment(date).startOf('day'),
+      endDate: moment(date).endOf('day'),
+    }
+    return this.getDailyStepCountSamples(options)
   }
 
-  // Will be deprecated in future releases
-  getWeeklySteps(startDate) {
-    googleFit.getWeeklySteps(Date.parse(startDate), Date.now())
+  /**
+   * A shortcut to get the weekly steps of a given day by using getDailyStepCountSamples
+   * @param {Date} date optional param, new Date() will be used if date is not provided
+   * @param {number} adjustment, use to adjust the default start day of week, 0 = Sunday, 1 = Monday, etc.
+   */
+  getWeeklySteps(date = new Date(), adjustment = 0) {
+    const [startDate, endDate] = getWeekBoundary(date, adjustment)
+    const options = {
+      startDate: startDate,
+      endDate: endDate,
+    }
+    return this.getDailyStepCountSamples(options)
   }
 
-  _retrieveDailyStepCountSamples = (startDate, endDate, callback) => {
+  isConfigsEmpty(obj) {
+    for (var prop in obj) return false
+    return true
+  }
+
+  _retrieveDailyStepCountSamples = (startDate, endDate, options, callback) => {
     googleFit.getDailyStepCountSamples(
       startDate,
       endDate,
+      options.configs,
       (msg) => callback(msg, false),
       (res) => {
         if (res.length > 0) {
@@ -172,6 +196,9 @@ class RNGoogleFit {
                 dev.source.appPackage +
                 (dev.source.stream ? ':' + dev.source.stream : '')
               obj.steps = buildDailySteps(dev.steps)
+              obj.rawSteps = this.isConfigsEmpty(options.configs)
+                ? []
+                : dev.steps
               return obj
             }, this)
           )
@@ -200,6 +227,7 @@ class RNGoogleFit {
         this._retrieveDailyStepCountSamples(
           startDate,
           endDate,
+          options,
           (error, result) => {
             if (!error) {
               resolve(result)
@@ -210,7 +238,7 @@ class RNGoogleFit {
         )
       })
     }
-    this._retrieveDailyStepCountSamples(startDate, endDate, callback)
+    this._retrieveDailyStepCountSamples(startDate, endDate, options, callback)
   }
 
   /**
@@ -249,9 +277,14 @@ class RNGoogleFit {
     const endDate = !isNil(options.endDate)
       ? Date.parse(options.endDate)
       : new Date().valueOf()
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || 'DAY'
+
     googleFit.getDailyDistanceSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit,
       (msg) => {
         callback(msg, false)
       },
@@ -300,10 +333,15 @@ class RNGoogleFit {
     const basalCalculation = options.basalCalculation !== false
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || 'DAY'
+
     googleFit.getDailyCalorieSamples(
       startDate,
       endDate,
       basalCalculation,
+      bucketInterval,
+      bucketUnit,
       (msg) => {
         callback(msg, false)
       },
@@ -320,9 +358,13 @@ class RNGoogleFit {
   getDailyNutritionSamples(options, callback) {
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || 'DAY'
     googleFit.getDailyNutritionSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit,
       (msg) => {
         callback(msg, false)
       },
@@ -441,9 +483,6 @@ class RNGoogleFit {
   }
 
   deleteWeight = (options, callback) => {
-    if (options.unit === 'pound') {
-      options.value = lbsAndOzToK({ pounds: options.value, ounces: 0 }) //convert pounds and ounces to kg
-    }
     googleFit.deleteWeight(
       prepareDeleteOptions(options),
       (msg) => {
@@ -456,7 +495,7 @@ class RNGoogleFit {
   }
 
   deleteHeight = (options, callback) => {
-    googleFit.deleteWeight(
+    googleFit.deleteHeight(
       prepareDeleteOptions(options),
       (msg) => {
         callback(msg, false)
@@ -535,9 +574,13 @@ class RNGoogleFit {
   getHeartRateSamples(options, callback) {
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || 'DAY'
     googleFit.getHeartRateSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit,
       (msg) => {
         callback(msg, false)
       },
@@ -554,9 +597,13 @@ class RNGoogleFit {
   getBloodPressureSamples(options, callback) {
     const startDate = Date.parse(options.startDate)
     const endDate = Date.parse(options.endDate)
+    const bucketInterval = options.bucketInterval || 1
+    const bucketUnit = options.bucketUnit || 'DAY'
     googleFit.getBloodPressureSamples(
       startDate,
       endDate,
+      bucketInterval,
+      bucketUnit,
       (msg) => {
         callback(msg, false)
       },

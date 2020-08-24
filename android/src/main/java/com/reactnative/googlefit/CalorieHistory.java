@@ -54,7 +54,7 @@ public class CalorieHistory {
         this.googleFitManager = googleFitManager;
     }
 
-    public ReadableArray aggregateDataByDate(long startTime, long endTime, boolean basalCalculation) {
+    public ReadableArray aggregateDataByDate(long startTime, long endTime, boolean basalCalculation, int bucketInterval, String bucketUnit) {
 
         DateFormat dateFormat = DateFormat.getDateInstance();
         Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
@@ -63,7 +63,7 @@ public class CalorieHistory {
         //Check how much calories were expended in specific days.
         DataReadRequest readRequest = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                .bucketByTime(1, TimeUnit.DAYS)
+                .bucketByTime(bucketInterval, HelperUtil.processBucketUnit(bucketUnit))
                 .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                 .build();
 

@@ -73,6 +73,26 @@ function getFormattedDate(date) {
   return year + '-' + month + '-' + day
 }
 
+/***
+* avoid month boundary issue by using millisecond calculation
+* TimeZone Issue
+* moment.js can be used as better alternative
+*/
+
+// export function getWeekBoundary(date, adjustment) {
+//   const dayMilliseconds = 24 * 60 * 60 * 1000;
+//   const currentWeekDay = date.getDay() - adjustment % 7;
+//   const startDate = new Date(date.setHours(0,0,0,0) - dayMilliseconds * currentWeekDay);
+//   const endDate = new Date(startDate.getTime() + dayMilliseconds * 7 -1);
+//   return [startDate, endDate];
+// }
+
+export function getWeekBoundary(date, adjustment) {
+  const startDate = moment(date).startOf('week').add(adjustment, 'days');
+  const endDate = moment(date).endOf('week').add(adjustment, 'days');
+  return [startDate, endDate];
+}
+
 export function prepareDeleteOptions(options) {
   return {
     ...options,
