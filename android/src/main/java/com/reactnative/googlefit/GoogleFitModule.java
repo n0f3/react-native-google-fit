@@ -132,11 +132,6 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
     }
 
     @ReactMethod
-    public void getDailySteps(double startDay, double endDay) {
-        mGoogleFitManager.getStepHistory().displayLastWeeksData((long) startDay, (long) endDay);
-    }
-
-    @ReactMethod
     public void getWorkoutSamples(double startDate, double endDate, Callback errorCallback, Callback successCallback) {
         try {
             successCallback.invoke(mGoogleFitManager.getActivityHistory().getWorkoutSamples((long)startDate, (long)endDate));
@@ -161,12 +156,7 @@ public class GoogleFitModule extends ReactContextBaseJavaModule implements Lifec
             errorCallback.invoke(e.getMessage());
         }
     }
-
-    @ReactMethod
-    public void getWeeklySteps(double startDate, double endDate) {
-        mGoogleFitManager.getStepHistory().displayLastWeeksData((long) startDate, (long) endDate);
-    }
-
+    
     @ReactMethod
     public void getDailyStepCountSamples(double startDate,
                                          double endDate,
